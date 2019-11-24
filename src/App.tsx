@@ -23,29 +23,35 @@ const getData = () => {
       .map(coordinatesString => ({
         lineNumber: lineNumber || null,
         lineString: lineString || null,
-        coordinatesString: coordinatesString || null
-        // coordinatesArray: coordinatesString.split("-").map(coordsString => {
-        //   // str could be like: `B1` or `BC1` or `B15` or `BC15`;
-        //   const rows = coordsString
-        //     .split("")
-        //     // .filter(character => /([A-F])/gi.test(character))
-        //     .filter(
-        //       character =>
-        //         true || ["A", "B", "C", "D", "E", "F"].includes(character)
-        //     );
+        coordinatesString: coordinatesString || null,
+        coordinatesArray: coordinatesString.split("-").reduce((previousValue, coordsString) => {
+          // str could be like: `B1` or `BC1` or `B15` or `BC15`;
+          const rows = coordsString
+            .split("")
+            .filter(
+              character =>
+                ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"].includes(character)
+            );
 
-        //   const columns = parseInt(
-        //     coordsString
-        //       .split("")
-        //       // .filter(character => /([1-6])/gi.test(character))
-        //       .filter(
-        //         character =>
-        //           true || ["1", "2", "3", "4", "5", "6"].includes(character)
-        //       )
-        //       .toString()
-        //   );
-        //   return [rows, columns];
-        // })
+          const columns =
+            coordsString
+              .split("")
+              .filter(
+                character =>
+                  ["1", "2", "3", "4", "5", "6"].includes(character)
+              )
+
+          // const coordinates = ['A1', 'B1'];
+          let coordinates = [];
+
+          rows.forEach(row => {
+            columns.forEach(column => {
+              // coordinates.push({ row, column }) // if we want an object
+              coordinates.push(`${row}${column}`)
+            })
+          })
+          return [...previousValue, ...coordinates];
+        }, []),
       }));
     return lineObjects.filter(
       el =>
