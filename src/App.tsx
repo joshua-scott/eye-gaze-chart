@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./App.css";
 import { data as dataString } from "./data";
 
+// interface LineData {
+//   lineNumber: number;
+//   lineString: string;
+//   coordinatesString: string;
+// }
+
 const getData = () => {
   const data = dataString.split("\n").map((lineString, lineNumber) => {
-    const lineObject = lineString
+    const lineObjects = lineString
       .split(/(\s+)/) // separate into an array of words (split by whitespace)
       .filter(s => /([A-J])/gi.test(s) === true) // coords must contain a letter A-J, remove any that don't
       .filter(s => /([1-6])/gi.test(s) === true) // coords must contain a number, remove any that don't
@@ -14,11 +20,10 @@ const getData = () => {
       .filter(s => /\d/g.test(s) === true) // coords must contain a number, remove any that don't
       .map(s => s.replace(/-+/g, "-")) // remove duplicate "-" characters
       .map(s => s.replace(/^-+/, "")) // remove leading "-" characters
-      // .pop() ?
       .map(coordinatesString => ({
-        lineNumber,
-        lineString,
-        coordinatesString
+        lineNumber: lineNumber || null,
+        lineString: lineString || null,
+        coordinatesString: coordinatesString || null
         // coordinatesArray: coordinatesString.split("-").map(coordsString => {
         //   // str could be like: `B1` or `BC1` or `B15` or `BC15`;
         //   const rows = coordsString
@@ -42,19 +47,15 @@ const getData = () => {
         //   return [rows, columns];
         // })
       }));
-    // .reduce(arr => {
-    //   if (arr.length === 0) {
-    //     return null;
-    //   } else if (arr.length > 1) {
-    //     console.error(`Found an array with more than one object inside it!`);
-    //   } else {
-    //     return arr[0];
-    //   }
-    // })
-    return lineObject.length ? lineObject[0] : null;
+    return lineObjects.filter(
+      el =>
+        el.lineNumber !== null &&
+        el.lineString !== null &&
+        el.coordinatesString !== null
+    );
   });
 
-  return data.filter(lineData => lineData !== null);
+  return data.flat();
 };
 
 const App: React.FC = () => {
