@@ -8,73 +8,13 @@ import { data as dataString } from "./data";
 //   coordinatesString: string;
 // }
 
-const getData = () => {
-  const data = dataString
-    .split("\n")
-    .map((lineString, lineIndex) => {
-      const lineObjects = lineString
-        .split(/(\s+)/) // separate into an array of words (split by whitespace)
-        .filter(s => /([A-J])/gi.test(s) === true) // coords must contain a letter A-J, remove any that don't
-        .filter(s => /([1-6])/gi.test(s) === true) // coords must contain a number, remove any that don't
-        .filter(s => /\d/g.test(s) === true) // coords must contain a number, remove any that don't
-        .filter(s => /Arttu|Onni|Reino|Samuli/g.test(s) === false) // remove words that contain the kids' names
-        .filter(s => (s.includes("(") || s.includes(")")) === false) // remove words containing brackets
-        .filter(s => /\d/g.test(s) === true) // coords must contain a number, remove any that don't
-        .map(s => s.replace(/-+/g, "-")) // remove duplicate "-" characters
-        .map(s => s.replace(/^-+/, "")) // remove leading "-" characters
-        .map(coordinatesString => ({
-          lineNumber: lineIndex ? lineIndex + 1 : null,
-          lineString: lineString || null,
-          coordinatesString: coordinatesString || null,
-          coordinatesArray: coordinatesString
-            .split("-")
-            .reduce((previousValue, coordsString) => {
-              // str could be like: `B1` or `BC1` or `B15` or `BC15`;
-              const rows = coordsString
-                .split("")
-                .filter(character =>
-                  ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"].includes(
-                    character
-                  )
-                );
-
-              const columns = coordsString
-                .split("")
-                .filter(character =>
-                  ["1", "2", "3", "4", "5", "6"].includes(character)
-                );
-
-              // const coordinates = ['A1', 'B1'];
-              let coordinates = [];
-
-              rows.forEach(row => {
-                columns.forEach(column => {
-                  // coordinates.push({ row, column }) // if we want an object
-                  coordinates.push(`${row}${column}`);
-                });
-              });
-              return [...previousValue, ...coordinates];
-            }, [])
-        }));
-      return lineObjects.filter(
-        el =>
-          el.lineNumber !== null &&
-          el.lineString !== null &&
-          el.coordinatesString !== null
-      );
-    })
-    .flat();
-
-  return data;
-};
+const ROWS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+const COLUMNS = ["1", "2", "3", "4", "5", "6"];
 
 const getParticipantName = lineNumber => {
   let participantName = "";
 
-  // P2: 1 - 93
-  // P4: 94 - 215
-  // P3: 216 - 623
-  // P1: 624 - 796
+  // P2: 1 - 93, P4: 94 - 215, P3: 216 - 623, P1: 624 - 796
   if (lineNumber >= 0 && lineNumber < 94) {
     participantName = "p2";
   } else if (lineNumber >= 94 && lineNumber < 216) {
@@ -101,7 +41,54 @@ const getCoordsArrayByParticipant = (
 };
 
 const App: React.FC = () => {
-  const lineData = getData();
+  const lineData = dataString
+    .split("\n")
+    .map((lineString, lineIndex) => {
+      return lineString
+        .split(/(\s+)/) // separate into an array of words (split by whitespace)
+        .filter(s => /([A-J])/gi.test(s) === true) // coords must contain a letter A-J, remove any that don't
+        .filter(s => /([1-6])/gi.test(s) === true) // coords must contain a number, remove any that don't
+        .filter(s => /\d/g.test(s) === true) // coords must contain a number, remove any that don't
+        .filter(s => /Arttu|Onni|Reino|Samuli/g.test(s) === false) // remove words that contain the kids' names
+        .filter(s => (s.includes("(") || s.includes(")")) === false) // remove words containing brackets
+        .filter(s => /\d/g.test(s) === true) // coords must contain a number, remove any that don't
+        .map(s => s.replace(/-+/g, "-")) // remove duplicate "-" characters
+        .map(s => s.replace(/^-+/, "")) // remove leading "-" characters
+        .map(coordinatesString => ({
+          lineNumber: lineIndex ? lineIndex + 1 : null,
+          lineString: lineString || null,
+          coordinatesString: coordinatesString || null,
+          coordinatesArray: coordinatesString
+            .split("-")
+            .reduce((previousValue, coordsString) => {
+              // coordsString could be like: `B1` or `BC1` or `B15` or `BC15`;
+              const rows = coordsString
+                .split("")
+                .filter(character => ROWS.includes(character));
+
+              const columns = coordsString
+                .split("")
+                .filter(character => COLUMNS.includes(character));
+
+              let coordinates = [];
+              rows.forEach(row => {
+                columns.forEach(column => {
+                  // coordinates.push({ row, column }) // if we want an object
+                  coordinates.push(`${row}${column}`);
+                });
+              });
+              return [...previousValue, ...coordinates];
+            }, [])
+        }))
+        .filter(
+          el =>
+            el.lineNumber !== null &&
+            el.lineString !== null &&
+            el.coordinatesString !== null
+        );
+    })
+    .flat();
+
   const coordinateData: [] = lineData.reduce((previousValue, currentValue) => {
     const res: object[] = [
       ...previousValue,
@@ -114,7 +101,7 @@ const App: React.FC = () => {
     return res;
   }, []);
 
-  const coordinateDataByParticipant: object = {
+  const coordinateDataByParticipant = {
     p1: getCoordsArrayByParticipant("p1", coordinateData),
     p2: getCoordsArrayByParticipant("p2", coordinateData),
     p3: getCoordsArrayByParticipant("p3", coordinateData),
@@ -122,10 +109,10 @@ const App: React.FC = () => {
   };
 
   const everyString = [
-    ...coordinateStrings.p1,
-    ...coordinateStrings.p2,
-    ...coordinateStrings.p3,
-    ...coordinateStrings.p4
+    ...coordinateDataByParticipant.p1,
+    ...coordinateDataByParticipant.p2,
+    ...coordinateDataByParticipant.p3,
+    ...coordinateDataByParticipant.p4
   ];
 
   console.log(everyString);
