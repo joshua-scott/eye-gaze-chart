@@ -53,9 +53,9 @@ const getData = () => {
         el.lineString !== null &&
         el.coordinatesString !== null
     );
-  });
+  }).flat();
 
-  return data.flat();
+  return data;
 };
 
 const App: React.FC = () => {
