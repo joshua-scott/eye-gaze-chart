@@ -43,7 +43,6 @@ const getData = () => {
         .filter(s => /\d/g.test(s) === true) // coords must contain a number, remove any that don't
         .filter(s => /Arttu|Onni|Reino|Samuli/g.test(s) === false) // remove words that contain the kids' names
         .filter(s => (s.includes("(") || s.includes(")")) === false) // remove words containing brackets
-        .filter(s => /\d/g.test(s) === true) // coords must contain a number, remove any that don't
         .map(s => s.replace(/-+/g, "-")) // remove duplicate "-" characters
         .map(s => s.replace(/^-+/, "")) // remove leading "-" characters
         .map(coordinatesString => ({
