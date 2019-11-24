@@ -100,14 +100,19 @@ const getData = () => {
     p4: getCoordsArrayByParticipant("p4", coordinateData)
   };
 
-  const everyString: string[] = [
+  const everyCoordinateString: string[] = [
     ...coordinateDataByParticipant.p1,
     ...coordinateDataByParticipant.p2,
     ...coordinateDataByParticipant.p3,
     ...coordinateDataByParticipant.p4
   ];
 
-  return { lineData, coordinateData, coordinateDataByParticipant, everyString };
+  return {
+    lineData,
+    coordinateData,
+    coordinateDataByParticipant,
+    everyCoordinateString
+  };
 };
 
 export default getData;

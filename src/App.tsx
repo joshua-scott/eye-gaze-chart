@@ -9,16 +9,16 @@ const App: React.FC = () => {
     lineData,
     coordinateData,
     coordinateDataByParticipant,
-    everyString
+    everyCoordinateString
   } = getData();
   console.log({
     lineData,
     coordinateData,
     coordinateDataByParticipant,
-    everyString
+    everyCoordinateString
   });
 
-  console.log(`lol`);
+  debugger;
 
   return (
     <div className="App">
