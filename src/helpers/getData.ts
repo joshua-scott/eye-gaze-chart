@@ -1,5 +1,10 @@
 import { data as dataString } from "../data/data";
-import { ParticipantName, LineData, DataByParticipant } from "../types";
+import {
+  ParticipantName,
+  ParticipantNameOrAll,
+  LineData,
+  DataByParticipant
+} from "../types";
 import { ROWS, COLUMNS } from "../constants";
 
 const getParticipantNameFromLineNumber = (
@@ -24,7 +29,7 @@ const getParticipantNameFromLineNumber = (
 };
 
 const getCoordsArrayByParticipant = (
-  pName: ParticipantName | "all",
+  pName: ParticipantNameOrAll,
   lineData: LineData
 ): string[] => {
   return lineData

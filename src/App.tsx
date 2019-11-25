@@ -17,10 +17,10 @@ const App: React.FC = () => {
       <main>
         {/* Grid of all coordinates, where the transparency varies on frequency (each one's transparency is a function of the % of total grid views) */}
         {["p1", "p2", "p3", "p4", "all"].map(
-          (participant: ParticipantNameOrAll) => (
+          (participantName: ParticipantNameOrAll) => (
             <HeatmapGrid
-              data={dataByParticipant[participant]}
-              key={participant}
+              coordinates={dataByParticipant[participantName]}
+              key={participantName}
             />
           )
         )}
