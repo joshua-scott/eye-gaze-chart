@@ -75,7 +75,7 @@ const getData = () => {
                 rows.forEach(row => {
                   columns.forEach(column => {
                     // coordinates.push({ row, column }) // if we want an object
-                    coordinates.push(`${row}${column}`);
+                    coordinates.push(`${column}${row}`);
                   });
                 });
                 return [...previousValue, ...coordinates];
