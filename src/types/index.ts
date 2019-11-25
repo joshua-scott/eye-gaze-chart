@@ -1,9 +1,13 @@
+export type ParticipantName = "p1" | "p2" | "p3" | "p4";
+export type ParticipantNameOrAll = ParticipantName | "all";
+export type CoordinatesArray = string[];
+
 export interface LineObject {
-  coordinatesArray: string[];
+  coordinatesArray: CoordinatesArray;
   coordinatesString: string;
   lineNumber: number;
   lineString: string;
-  participantName: "p1" | "p2" | "p3" | "p4";
+  participantName: ParticipantName;
 }
 
 export type LineData = LineObject[];

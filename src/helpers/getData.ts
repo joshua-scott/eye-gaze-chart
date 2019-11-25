@@ -1,11 +1,11 @@
 import { data as dataString } from "../data/data";
-import { LineData, DataByParticipant } from "../types";
+import { ParticipantName, LineData, DataByParticipant } from "../types";
+import { ROWS, COLUMNS } from "../constants";
 
-const ROWS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-const COLUMNS = ["1", "2", "3", "4", "5", "6"];
-
-const getParticipantName = (lineNumber: number): "p1" | "p2" | "p3" | "p4" => {
-  let participantName = null;
+const getParticipantNameFromLineNumber = (
+  lineNumber: number
+): ParticipantName => {
+  let participantName: ParticipantName = "p1";
 
   // P2: 1 - 93, P4: 94 - 215, P3: 216 - 623, P1: 624 - 796
   if (lineNumber >= 0 && lineNumber < 94) {
@@ -24,7 +24,7 @@ const getParticipantName = (lineNumber: number): "p1" | "p2" | "p3" | "p4" => {
 };
 
 const getCoordsArrayByParticipant = (
-  pName: "p1" | "p2" | "p3" | "p4" | "all",
+  pName: ParticipantName | "all",
   lineData: LineData
 ): string[] => {
   return lineData
@@ -40,24 +40,23 @@ const getData = () => {
     .split("\n")
     .map((lineString, lineIndex) => {
       return lineString
-        .split(/(\s+)/) // separate into an array of words (split by whitespace)
-        .filter(s => /([A-J])/gi.test(s) === true) // coords must contain a letter A-J, remove any that don't
-        .filter(s => /([1-6])/gi.test(s) === true) // coords must contain a number, remove any that don't
-        .filter(s => /\d/g.test(s) === true) // coords must contain a number, remove any that don't
-        .filter(s => /Arttu|Onni|Reino|Samuli/g.test(s) === false) // remove words that contain the kids' names
-        .filter(s => (s.includes("(") || s.includes(")")) === false) // remove words containing brackets
+        .split(/(\s+)/) // separate into an array of strings (split by whitespace)
+        .filter(s => /REDACTED_NAME/g.test(s) === false) // filter out redacted names
+        .filter(s => (s.includes("(") || s.includes(")")) === false) // coords don't contain parentheses
+        .filter(s => /([A-J])/gi.test(s) === true) // coords contain letters A-J
+        .filter(s => /([1-6])/gi.test(s) === true) // coords contain numbers 1-6
         .map(s => s.replace(/-+/g, "-")) // remove duplicate "-" characters
         .map(s => s.replace(/^-+/, "")) // remove leading "-" characters
         .map((coordinatesString: string) => {
-          const lineNumber: number | null = lineIndex ? lineIndex + 1 : null;
+          const lineNumber: number = lineIndex + 1;
           return {
             lineNumber,
-            lineString: lineString || null,
-            participantName: getParticipantName(lineNumber),
-            coordinatesString: coordinatesString || null,
+            lineString,
+            coordinatesString,
+            participantName: getParticipantNameFromLineNumber(lineNumber),
             coordinatesArray: coordinatesString
               .split("-")
-              .reduce((previousValue, coordsString) => {
+              .reduce((previousValue: string[], coordsString: string) => {
                 // coordsString could be like: `B1` or `BC1` or `B15` or `BC15`;
                 const rows = coordsString
                   .split("")
@@ -67,7 +66,7 @@ const getData = () => {
                   .split("")
                   .filter(character => COLUMNS.includes(character));
 
-                let coordinates = [];
+                let coordinates: string[] = [];
                 rows.forEach(row => {
                   columns.forEach(column => {
                     // coordinates.push({ row, column }) // if we want an object

@@ -1,15 +1,19 @@
 import React from "react";
-import { LineData } from "../types";
+import { LineData, CoordinatesArray } from "../types";
+import { ROWS, COLUMNS } from "../constants";
 
 interface Props {
-  data: LineData;
+  data: CoordinatesArray;
 }
 
+// todo: make this render a table with colour gradient based on the frequency
 const HeatmapGrid: React.FC<Props> = ({ data }) => {
   return (
     <div>
       <p>HeatmapGrid</p>
-      <p>{data.toString()}</p>
+      {data.map(string => (
+        <p>{string}</p>
+      ))}
     </div>
   );
 };
