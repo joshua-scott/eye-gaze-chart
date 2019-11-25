@@ -1,9 +1,8 @@
 import React from "react";
 import "./App.css";
 import getData from "./helpers/getData";
-import RawDataTable from "./components/RawDataTable";
 import HeatmapGrid from "./components/HeatmapGrid";
-import { LineData, DataByParticipant, ParticipantNameOrAll } from "./types";
+import { ParticipantNameOrAll } from "./types";
 
 const App: React.FC = () => {
   const { lineData, dataByParticipant } = getData();
@@ -25,7 +24,7 @@ const App: React.FC = () => {
           )
         )}
 
-        <RawDataTable lineData={lineData} />
+        {/* <RawDataTable lineData={lineData} /> */}
       </main>
     </div>
   );

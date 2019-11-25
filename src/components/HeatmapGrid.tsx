@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  LineData,
-  CoordinatesArray,
-  CoordinatesFrequencyCount
-} from "../types";
+import { CoordinatesArray } from "../types";
 import { ROWS, COLUMNS } from "../constants";
 
 interface Props {
@@ -20,13 +16,21 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates }) => {
     });
   });
 
-  console.log(coordinatesCount);
+  console.log({ coordinatesCount });
+
   return (
     <div>
-      <p>HeatmapGrid</p>
-      {coordinates.map(coordinateString => (
+      <div>
+        {ROWS.map(row =>
+          COLUMNS.map(column => (
+            <div>{coordinatesCount[`${row}${column}`]}</div>
+          ))
+        )}
+      </div>
+
+      {/* {coordinates.map(coordinateString => (
         <p>{coordinateString}</p>
-      ))}
+      ))} */}
     </div>
   );
 };
