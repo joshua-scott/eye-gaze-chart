@@ -5,26 +5,19 @@ import RawDataTable from "./components/RawDataTable";
 import HeatmapGrid from "./components/HeatmapGrid";
 
 const App: React.FC = () => {
-  const {
-    lineData,
-    coordinateData,
-    coordinateDataByParticipant,
-    everyCoordinateString
-  } = getData();
+  const { lineData, dataByParticipant } = getData();
   console.log({
     lineData,
-    coordinateData,
-    coordinateDataByParticipant,
-    everyCoordinateString
+    dataByParticipant
   });
 
-  debugger;
+  // todo: add participantName to lineData, then remove coordinatesData
 
   return (
     <div className="App">
       <main>
         {/* Grid of all coordinates, where the transparency varies on frequency (each one's transparency is a function of the % of total grid views) */}
-        <HeatmapGrid data={coordinateData} />
+        <HeatmapGrid data={lineData} />
 
         <RawDataTable lineData={lineData} />
       </main>

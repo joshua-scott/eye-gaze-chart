@@ -1,10 +1,11 @@
 import { data as dataString } from "../data/data";
+import { LineData, DataByParticipant } from "../types";
 
 const ROWS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 const COLUMNS = ["1", "2", "3", "4", "5", "6"];
 
-const getParticipantName = lineNumber => {
-  let participantName = "";
+const getParticipantName = (lineNumber: number): "p1" | "p2" | "p3" | "p4" => {
+  let participantName = null;
 
   // P2: 1 - 93, P4: 94 - 215, P3: 216 - 623, P1: 624 - 796
   if (lineNumber >= 0 && lineNumber < 94) {
@@ -23,17 +24,19 @@ const getParticipantName = lineNumber => {
 };
 
 const getCoordsArrayByParticipant = (
-  participantName: string,
-  allCoordsData: object[]
-): { coordinatesArray: string[] } => {
-  return allCoordsData
-    .filter(({ participant }) => participant === participantName)
+  pName: "p1" | "p2" | "p3" | "p4" | "all",
+  lineData: LineData
+): string[] => {
+  return lineData
+    .filter(({ participantName }) =>
+      pName === "all" ? true : participantName === pName
+    )
     .map(({ coordinatesArray }) => coordinatesArray)
     .flat(1);
 };
 
 const getData = () => {
-  const lineData = dataString
+  const lineData: LineData = dataString
     .split("\n")
     .map((lineString, lineIndex) => {
       return lineString
@@ -45,32 +48,36 @@ const getData = () => {
         .filter(s => (s.includes("(") || s.includes(")")) === false) // remove words containing brackets
         .map(s => s.replace(/-+/g, "-")) // remove duplicate "-" characters
         .map(s => s.replace(/^-+/, "")) // remove leading "-" characters
-        .map(coordinatesString => ({
-          lineNumber: lineIndex ? lineIndex + 1 : null,
-          lineString: lineString || null,
-          coordinatesString: coordinatesString || null,
-          coordinatesArray: coordinatesString
-            .split("-")
-            .reduce((previousValue, coordsString) => {
-              // coordsString could be like: `B1` or `BC1` or `B15` or `BC15`;
-              const rows = coordsString
-                .split("")
-                .filter(character => ROWS.includes(character));
+        .map((coordinatesString: string) => {
+          const lineNumber: number | null = lineIndex ? lineIndex + 1 : null;
+          return {
+            lineNumber,
+            lineString: lineString || null,
+            participantName: getParticipantName(lineNumber),
+            coordinatesString: coordinatesString || null,
+            coordinatesArray: coordinatesString
+              .split("-")
+              .reduce((previousValue, coordsString) => {
+                // coordsString could be like: `B1` or `BC1` or `B15` or `BC15`;
+                const rows = coordsString
+                  .split("")
+                  .filter(character => ROWS.includes(character));
 
-              const columns = coordsString
-                .split("")
-                .filter(character => COLUMNS.includes(character));
+                const columns = coordsString
+                  .split("")
+                  .filter(character => COLUMNS.includes(character));
 
-              let coordinates = [];
-              rows.forEach(row => {
-                columns.forEach(column => {
-                  // coordinates.push({ row, column }) // if we want an object
-                  coordinates.push(`${row}${column}`);
+                let coordinates = [];
+                rows.forEach(row => {
+                  columns.forEach(column => {
+                    // coordinates.push({ row, column }) // if we want an object
+                    coordinates.push(`${row}${column}`);
+                  });
                 });
-              });
-              return [...previousValue, ...coordinates];
-            }, [])
-        }))
+                return [...previousValue, ...coordinates];
+              }, [])
+          };
+        })
         .filter(
           el =>
             el.lineNumber !== null &&
@@ -80,37 +87,17 @@ const getData = () => {
     })
     .flat();
 
-  const coordinateData: [] = lineData.reduce((previousValue, currentValue) => {
-    const res: object[] = [
-      ...previousValue,
-      {
-        coordinatesArray: [...currentValue.coordinatesArray],
-        lineNumber: currentValue.lineNumber,
-        participant: getParticipantName(currentValue.lineNumber)
-      }
-    ];
-    return res;
-  }, []);
-
-  const coordinateDataByParticipant = {
-    p1: getCoordsArrayByParticipant("p1", coordinateData),
-    p2: getCoordsArrayByParticipant("p2", coordinateData),
-    p3: getCoordsArrayByParticipant("p3", coordinateData),
-    p4: getCoordsArrayByParticipant("p4", coordinateData)
+  const dataByParticipant: DataByParticipant = {
+    p1: [...getCoordsArrayByParticipant("p1", lineData)],
+    p2: [...getCoordsArrayByParticipant("p2", lineData)],
+    p3: [...getCoordsArrayByParticipant("p3", lineData)],
+    p4: [...getCoordsArrayByParticipant("p4", lineData)],
+    all: [...getCoordsArrayByParticipant("all", lineData)]
   };
-
-  const everyCoordinateString: string[] = [
-    ...coordinateDataByParticipant.p1,
-    ...coordinateDataByParticipant.p2,
-    ...coordinateDataByParticipant.p3,
-    ...coordinateDataByParticipant.p4
-  ];
 
   return {
     lineData,
-    coordinateData,
-    coordinateDataByParticipant,
-    everyCoordinateString
+    dataByParticipant
   };
 };
 

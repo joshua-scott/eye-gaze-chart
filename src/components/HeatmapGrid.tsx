@@ -1,6 +1,11 @@
 import React from "react";
+import { LineData } from "../types";
 
-const HeatmapGrid: React.FC = ({ data }) => {
+interface Props {
+  data: LineData;
+}
+
+const HeatmapGrid: React.FC<Props> = ({ data }) => {
   return (
     <div>
       <p>HeatmapGrid</p>

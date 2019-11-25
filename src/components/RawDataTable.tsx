@@ -1,8 +1,11 @@
 import React from "react";
+import { LineData } from "../types";
 
-const RawDataTable: React.FC = ({ lineData }) => {
-  console.log(`raw data table!`);
-  console.log(lineData);
+interface Props {
+  lineData: LineData;
+}
+
+const RawDataTable: React.FC<Props> = ({ lineData }) => {
   return (
     <table>
       <thead>
