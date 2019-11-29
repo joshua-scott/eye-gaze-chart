@@ -1,6 +1,6 @@
-import React from "react";
+import React, { Fragment } from "react";
 import styled, { css } from "styled-components";
-import { CoordinatesArray, ParticipantNameOrAll } from "../types";
+import { CoordinatesArray } from "../types";
 import { ROWS, COLUMNS } from "../constants";
 
 interface Props {
@@ -10,27 +10,29 @@ interface Props {
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(11, 100px);
-  grid-template-rows: repeat(7, 100px);
-  border-bottom: 2px solid black;
+  grid-template-columns: repeat(11, 80px);
+  grid-template-rows: repeat(7, 80px);
+  margin: 20px;
 `;
 
 const GridItem = styled.div`
   background-color: rgba(0, 95, 106, ${p => p.transparency});
-  color: ${p => (p.transparency < 0.5 ? "black" : "white")};
+  color: ${props => (props.transparency < 0.5 ? "black" : "white")};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  border: 1px solid black;
 `;
 
 const LabelItem = styled(GridItem)`
-  ${p =>
-    !p.whiteBackground &&
+  ${props =>
+    !props.whiteBackground &&
     css`
       background-color: rgba(0, 95, 106, 1);
     `}
+  border: none;
 `;
 
 const HeatmapGrid: React.FC<Props> = ({ coordinates, participantName }) => {
@@ -57,11 +59,11 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates, participantName }) => {
   );
 
   return (
-    <div className={participantName}>
+    <div className={participantName} key={`${participantName}-heatmapgrid`}>
       <Grid>
         <LabelItem whiteBackground={true} />
         {COLUMNS.map(column => (
-          <LabelItem>{column}</LabelItem>
+          <LabelItem key={column}>{column}</LabelItem>
         ))}
         {ROWS.map(row =>
           COLUMNS.map(column => {
@@ -70,14 +72,14 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates, participantName }) => {
             const percentageOfMax = (count / max) * 100;
             const percentageOfTotal = (count / total) * 100;
             return (
-              <>
+              <Fragment key={coords}>
                 {column === "A" && <LabelItem>{row}</LabelItem>}
                 <GridItem transparency={Math.max(percentageOfMax, 1) / 100}>
                   <strong>{count}</strong>
                   <br />
                   {`${percentageOfTotal.toFixed(2)}%`}
                 </GridItem>
-              </>
+              </Fragment>
             );
           })
         )}
