@@ -23,13 +23,13 @@ const GridItem = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
+`;
 
-  ${props => css`border-${props.border}: 2px solid rgb(0, 95, 106);`}
-
-  ${props =>
-    props.border &&
+const LabelItem = styled(GridItem)`
+  ${p =>
+    !p.whiteBackground &&
     css`
-      background-color: rgba(0, 95, 106, 0.1);
+      background-color: rgba(0, 95, 106, 1);
     `}
 `;
 
@@ -41,8 +41,6 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates, participantName }) => {
       coordinatesCount[coords] = coordinates.filter(c => c === coords).length;
     });
   });
-
-  console.log({ coordinatesCount });
 
   const max = Object.keys(coordinatesCount).reduce(
     (previousValue, coordString) => {
@@ -61,11 +59,9 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates, participantName }) => {
   return (
     <div className={participantName}>
       <Grid>
-        <GridItem transparency={0} />
+        <LabelItem whiteBackground={true} />
         {COLUMNS.map(column => (
-          <GridItem transparency={0} border="bottom">
-            {column}
-          </GridItem>
+          <LabelItem>{column}</LabelItem>
         ))}
         {ROWS.map(row =>
           COLUMNS.map(column => {
@@ -75,11 +71,7 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates, participantName }) => {
             const percentageOfTotal = (count / total) * 100;
             return (
               <>
-                {column === "A" && (
-                  <GridItem transparency={0} border="right">
-                    {row}
-                  </GridItem>
-                )}
+                {column === "A" && <LabelItem>{row}</LabelItem>}
                 <GridItem transparency={Math.max(percentageOfMax, 1) / 100}>
                   <strong>{count}</strong>
                   <br />
