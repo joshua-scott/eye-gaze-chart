@@ -21,6 +21,7 @@ const App: React.FC = () => {
               <h2>{participantName}:</h2>
               <HeatmapGrid
                 coordinates={dataByParticipant[participantName]}
+                participantName={participantName}
                 key={participantName}
               />
             </>
