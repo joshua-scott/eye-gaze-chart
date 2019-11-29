@@ -15,10 +15,10 @@ const Grid = styled.div`
 `;
 
 const GridItem = styled.div`
-  background-color: red;
+  background-color: rgba(0, 95, 106, ${p => p.transparency});
+  color: ${p => (p.transparency < 0.5 ? "black" : "white")};
 `;
 
-// todo: make this render a table with colour gradient based on the frequency
 const HeatmapGrid: React.FC<Props> = ({ coordinates }) => {
   let coordinatesCount = {};
   ROWS.forEach(row => {
@@ -29,14 +29,12 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates }) => {
   });
 
   console.log({ coordinatesCount });
-  // const max = Object.keys(coordinatesCount).reduce((previousValue, currentValue) => {
-  //   return Math.max(coordinatesCount[currentValue], coordinatesCount[previousValue])
-  // }, 0);
 
-  const max = Math.max(
-    Object.keys(coordinatesCount).map(
-      (key: ParticipantNameOrAll) => coordinatesCount[key]
-    )
+  const max = Object.keys(coordinatesCount).reduce(
+    (previousValue, coordString) => {
+      return Math.max(coordinatesCount[coordString] || 0, previousValue || 0);
+    },
+    0
   );
 
   return (
@@ -45,11 +43,13 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates }) => {
         {ROWS.map(row =>
           COLUMNS.map(column => {
             const count = parseInt(coordinatesCount[`${column}${row}`]);
-            const ratingAsPercentageOfMax = (count / max) * 100;
+            const percentageOfMax = (count / max) * 100;
             return (
-              <GridItem ratingAsPercentageOfMax={ratingAsPercentageOfMax}>
+              <GridItem transparency={Math.max(percentageOfMax, 1) / 100}>
                 {column}
-                {row}:<strong>{count}</strong> ( {ratingAsPercentageOfMax} )
+                {row}:<strong>{count}</strong>
+                <br />
+                {`(${percentageOfMax.toFixed(1)}% of max)`}
               </GridItem>
             );
           })
