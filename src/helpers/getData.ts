@@ -3,7 +3,8 @@ import {
   ParticipantName,
   ParticipantNameOrAll,
   LineData,
-  DataByParticipant
+  DataByParticipant,
+  CoordinatesArray
 } from "../types";
 import { ROWS, COLUMNS } from "../constants";
 
@@ -54,32 +55,36 @@ const getData = () => {
         .map(s => s.replace(/^-+/, "")) // remove leading "-" characters
         .map((coordinatesString: string) => {
           const lineNumber: number = lineIndex + 1;
+          const participantName: ParticipantName = getParticipantNameFromLineNumber(
+            lineNumber
+          );
+          const coordinatesArray: CoordinatesArray = coordinatesString
+            .split("-")
+            .reduce((previousValue: string[], coordsString: string) => {
+              // coordsString could be like: `B1` or `BC1` or `B15` or `BC15`;
+              const rows = coordsString
+                .split("")
+                .filter(character => ROWS.includes(character));
+
+              const columns = coordsString
+                .split("")
+                .filter(character => COLUMNS.includes(character));
+
+              let coordinates: string[] = [];
+              rows.forEach(row => {
+                columns.forEach(column => {
+                  // coordinates.push({ row, column }) // if we want an object
+                  coordinates.push(`${column}${row}`);
+                });
+              });
+              return [...previousValue, ...coordinates];
+            }, []);
           return {
             lineNumber,
             lineString,
             coordinatesString,
-            participantName: getParticipantNameFromLineNumber(lineNumber),
-            coordinatesArray: coordinatesString
-              .split("-")
-              .reduce((previousValue: string[], coordsString: string) => {
-                // coordsString could be like: `B1` or `BC1` or `B15` or `BC15`;
-                const rows = coordsString
-                  .split("")
-                  .filter(character => ROWS.includes(character));
-
-                const columns = coordsString
-                  .split("")
-                  .filter(character => COLUMNS.includes(character));
-
-                let coordinates: string[] = [];
-                rows.forEach(row => {
-                  columns.forEach(column => {
-                    // coordinates.push({ row, column }) // if we want an object
-                    coordinates.push(`${column}${row}`);
-                  });
-                });
-                return [...previousValue, ...coordinates];
-              }, [])
+            participantName,
+            coordinatesArray
           };
         })
         .filter(
