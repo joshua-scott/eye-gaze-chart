@@ -16,25 +16,30 @@ const Section = styled.section`
 
 const App: React.FC = () => {
   const { lineData, dataByParticipant } = getData();
-  console.log({
-    lineData,
-    dataByParticipant
-  });
-
   return (
     <div className="App">
       <Main>
-        {["p1", "p2", "p3", "p4", "all"].map(
-          (participantName: ParticipantNameOrAll) => (
-            <Section key={participantName}>
-              <h2>{participantName}:</h2>
-              <HeatmapGrid
-                coordinates={dataByParticipant[participantName]}
-                participantName={participantName}
-              />
-            </Section>
-          )
-        )}
+        {[
+          "p1",
+          "p1Target",
+          "p2",
+          "p2Target",
+          "p3",
+          "p3Target",
+          "p4",
+          "p4Target",
+          "all",
+          "allTarget"
+        ].map((participantName: ParticipantNameOrAll) => (
+          <Section key={participantName}>
+            <h2>{participantName}:</h2>
+            <HeatmapGrid
+              coordinates={dataByParticipant[participantName]}
+              participantName={participantName}
+              color={participantName.endsWith("Target") ? "alt" : "default"}
+            />
+          </Section>
+        ))}
 
         <div style={{ margin: "50px" }} />
 

@@ -1,11 +1,12 @@
 import React, { Fragment } from "react";
 import styled, { css } from "styled-components";
 import { CoordinatesArray } from "../types";
-import { ROWS, COLUMNS } from "../constants";
+import { ROWS, COLUMNS, RED, GREEN } from "../constants";
 
 interface Props {
   coordinates: CoordinatesArray;
   participantName: string;
+  color: "default" | "alt";
 }
 
 const Grid = styled.div`
@@ -16,7 +17,6 @@ const Grid = styled.div`
 `;
 
 const GridItem = styled.div`
-  background-color: rgba(0, 95, 106, ${p => p.transparency});
   color: ${props => (props.transparency < 0.5 ? "black" : "white")};
   display: flex;
   flex-direction: column;
@@ -24,18 +24,40 @@ const GridItem = styled.div`
   justify-content: center;
   text-align: center;
   border: 1px solid black;
+  ${props =>
+    props.color === "default"
+      ? css`
+          background-color: rgba(0, 95, 106, ${props => props.transparency});
+        `
+      : props.color === "alt"
+      ? css`
+          background-color: rgba(95, 2, 31, ${props => props.transparency});
+        `
+      : css``}
 `;
 
 const LabelItem = styled(GridItem)`
   ${props =>
-    !props.whiteBackground &&
-    css`
-      background-color: rgba(0, 95, 106, 1);
-    `}
+    props.color === "default"
+      ? css`
+          background-color: ${GREEN};
+        `
+      : props.color === "alt"
+      ? css`
+          background-color: ${RED};
+        `
+      : props.whiteBackground &&
+        css`
+          background: white;
+        `}
   border: none;
 `;
 
-const HeatmapGrid: React.FC<Props> = ({ coordinates, participantName }) => {
+const HeatmapGrid: React.FC<Props> = ({
+  coordinates,
+  participantName,
+  color
+}) => {
   let coordinatesCount = {};
   ROWS.forEach(row => {
     COLUMNS.forEach(column => {
@@ -63,7 +85,9 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates, participantName }) => {
       <Grid>
         <LabelItem whiteBackground={true} />
         {COLUMNS.map(column => (
-          <LabelItem key={column}>{column}</LabelItem>
+          <LabelItem key={column} color={color}>
+            {column}
+          </LabelItem>
         ))}
         {ROWS.map(row =>
           COLUMNS.map(column => {
@@ -73,8 +97,11 @@ const HeatmapGrid: React.FC<Props> = ({ coordinates, participantName }) => {
             const percentageOfTotal = (count / total) * 100;
             return (
               <Fragment key={coords}>
-                {column === "A" && <LabelItem>{row}</LabelItem>}
-                <GridItem transparency={Math.max(percentageOfMax, 1) / 100}>
+                {column === "A" && <LabelItem color={color}>{row}</LabelItem>}
+                <GridItem
+                  color={color}
+                  transparency={Math.max(percentageOfMax, 1) / 100}
+                >
                   <strong>{count}</strong>
                   <br />
                   {`${percentageOfTotal.toFixed(2)}%`}

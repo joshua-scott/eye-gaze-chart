@@ -41,6 +41,44 @@ const getCoordsArrayByParticipant = (
     .flat(1);
 };
 
+const getTargetArrayByParticipant = (
+  pName: ParticipantNameOrAll,
+  lineData: LineData
+): string[] => {
+  return lineData
+    .filter(({ participantName }) =>
+      pName === "all" ? true : participantName === pName
+    )
+    .map(({ targetArray }) => targetArray)
+    .flat(1);
+};
+
+const getCoordsArrayFromCoordsString = (
+  coordsString: string
+): CoordinatesArray => {
+  return coordsString
+    .split("-")
+    .reduce((previousValue: string[], coordsString: string) => {
+      // coordsString could be like: `B1` or `BC1` or `B15` or `BC15`;
+      const rows = coordsString
+        .split("")
+        .filter(character => ROWS.includes(character));
+
+      const columns = coordsString
+        .split("")
+        .filter(character => COLUMNS.includes(character));
+
+      let coordinates: string[] = [];
+      rows.forEach(row => {
+        columns.forEach(column => {
+          // coordinates.push({ row, column }) // if we want an object
+          coordinates.push(`${column}${row}`);
+        });
+      });
+      return [...previousValue, ...coordinates];
+    }, []);
+};
+
 const getData = () => {
   const lineData: LineData = dataString
     .split("\n")
@@ -58,33 +96,30 @@ const getData = () => {
           const participantName: ParticipantName = getParticipantNameFromLineNumber(
             lineNumber
           );
-          const coordinatesArray: CoordinatesArray = coordinatesString
-            .split("-")
-            .reduce((previousValue: string[], coordsString: string) => {
-              // coordsString could be like: `B1` or `BC1` or `B15` or `BC15`;
-              const rows = coordsString
-                .split("")
-                .filter(character => ROWS.includes(character));
+          const coordinatesArray: CoordinatesArray = getCoordsArrayFromCoordsString(
+            coordinatesString
+          );
+          const targetString: string =
+            lineString
+              .split(/(\s+)/) // separate into an array of strings (split by whitespace)
+              .filter(s => s.startsWith("(") && s.endsWith(")")) // target string is in parentheses
+              .map(str => str.replace("(", "").replace(")", ""))
+              .find(str => !!str) || "";
+          const targetArray: CoordinatesArray = getCoordsArrayFromCoordsString(
+            targetString
+          );
 
-              const columns = coordsString
-                .split("")
-                .filter(character => COLUMNS.includes(character));
+          console.log(`TARGET STRING: `, targetString);
+          console.log(`TARGET ARRAY: `, targetArray);
 
-              let coordinates: string[] = [];
-              rows.forEach(row => {
-                columns.forEach(column => {
-                  // coordinates.push({ row, column }) // if we want an object
-                  coordinates.push(`${column}${row}`);
-                });
-              });
-              return [...previousValue, ...coordinates];
-            }, []);
           return {
+            targetString,
+            targetArray,
+            coordinatesArray,
+            coordinatesString,
             lineNumber,
             lineString,
-            coordinatesString,
-            participantName,
-            coordinatesArray
+            participantName
           };
         })
         .filter(
@@ -98,10 +133,15 @@ const getData = () => {
 
   const dataByParticipant: DataByParticipant = {
     p1: [...getCoordsArrayByParticipant("p1", lineData)],
+    p1Target: [...getTargetArrayByParticipant("p1", lineData)],
     p2: [...getCoordsArrayByParticipant("p2", lineData)],
+    p2Target: [...getTargetArrayByParticipant("p2", lineData)],
     p3: [...getCoordsArrayByParticipant("p3", lineData)],
+    p3Target: [...getTargetArrayByParticipant("p3", lineData)],
     p4: [...getCoordsArrayByParticipant("p4", lineData)],
-    all: [...getCoordsArrayByParticipant("all", lineData)]
+    p4Target: [...getTargetArrayByParticipant("p4", lineData)],
+    all: [...getCoordsArrayByParticipant("all", lineData)],
+    allTarget: [...getTargetArrayByParticipant("all", lineData)]
   };
 
   return {

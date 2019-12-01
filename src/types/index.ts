@@ -3,6 +3,8 @@ export type ParticipantNameOrAll = ParticipantName | "all";
 export type CoordinatesArray = string[];
 
 export interface LineObject {
+  targetString: string;
+  targetArray: CoordinatesArray;
   coordinatesArray: CoordinatesArray;
   coordinatesString: string;
   lineNumber: number;
@@ -18,6 +20,11 @@ export interface DataByParticipant {
   p3: string[];
   p4: string[];
   all: string[];
+  p1Target: string[];
+  p2Target: string[];
+  p3Target: string[];
+  p4Target: string[];
+  allTarget: string[];
 }
 
 export interface CoordinatesFrequencyCount {
